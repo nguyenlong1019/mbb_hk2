@@ -90,3 +90,30 @@ class MBBank:
             json_data.update(json) 
 
             # line 82 
+
+    
+    def _get_wasm_file(self):
+        pass 
+
+
+    def _authenticate(self):
+        pass 
+
+
+    def getTransactionAccountHistory(self):
+        pass 
+
+
+    def getBalance(self):
+        pass 
+
+
+    def getBalanceLoyalty(self):
+        pass 
+
+
+    def getInterestRate(self, currency: str = "VND"):
+        pass 
+
+
+    
