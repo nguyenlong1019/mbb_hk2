@@ -1,0 +1,10 @@
+certifi==2024.8.30
+charset-normalizer==3.3.2
+idna==3.10
+importlib_resources==6.4.5
+packaging==24.1
+pillow==10.4.0
+pytesseract==0.3.13
+requests==2.32.3
+urllib3==2.2.3
+wasmtime==25.0.0
