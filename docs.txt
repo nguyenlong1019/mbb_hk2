@@ -1,0 +1,48 @@
+Origin source:
+https://github.com/thedtvn/MBBank/tree/main 
+
+Sử dụng thư viện Pillow, requests, pytesseract, aiohttp, wasmtime 
+
+
+pytesseract
+https://pypi.org/project/pytesseract/#description  
+Dev from 2014 to 2024  
+Python-tesseract là công cụ nhận dạng ký tự quang học (OCR) dành cho 
+python. Tức là nó sẽ nhận dạng và “đọc” văn bản được nhúng trong hình 
+ảnh.
+Python-tesseract là một trình bao bọc cho Tesseract-OCR Engine của 
+Google. Nó cũng hữu ích như một tập lệnh gọi tesseract độc lập, vì nó 
+có thể đọc tất cả các loại hình ảnh được hỗ trợ bởi thư viện hình ảnh 
+Pillow và Leptonica, bao gồm jpeg, png, gif, bmp, tiff và các loại 
+khác. Ngoài ra, nếu được sử dụng làm tập lệnh, Python-tesseract sẽ in 
+văn bản được nhận dạng thay vì ghi nó vào một tệp.
+
+
+aiohttp 
+https://pypi.org/project/aiohttp/#description 
+Dev from 2013 to 2024 
+Async http client/server framework (asyncio) 
+Key features:
+    Supports both client and server side of HTTP protocol.
+    Supports both client and server Web-Sockets out-of-the-box and 
+avoids Callback Hell.
+    Provides Web-server with middleware and pluggable routing.
+
+wasmtime 
+https://pypi.org/project/wasmtime/#description  
+Dev from 2019 to 2024 
+A WebAssembly runtime powered by Wasmtime 
+là một runtime cho WebAssembly (Wasm) cung cấp môi trường nhẹ và hiệu quả để chạy các module WebAssembly trên nhiều nền tảng khác nhau 
+
+Pillow 
+https://pypi.org/project/pillow/#description 
+Dev from 2010 to 2024 
+Python Imaging Library (Fork)
+
+requests 
+https://pypi.org/project/requests/
+Dev from 2011 to 2024 
+Python HTTP for humans 
+
+
+
