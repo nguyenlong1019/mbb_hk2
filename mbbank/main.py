@@ -11,7 +11,7 @@ headers_default = {
     'Cache-Control': 'no-cache',
     'Accept': 'application/json, text/plain, */*',
     'App': 'MB_WEB',
-    'Authorization': 'Basic ', ######################################################
+    'Authorization': 'Basic RU1CUkVUQUlMV0VCOlNEMjM0ZGZnMzQlI0BGR0AzNHNmc2RmNDU4NDNm', 
     'User-Agent': f'Mozilla/5.0 (X11; {platform.system()} {platform.processor()})',
     'Origin': 'https://online.mbbank.com.vn',
     'Referer': 'https://online.mbbank.com.vn/',
@@ -45,7 +45,7 @@ class MBBank:
         ocr_class (CapchaProcessing, optional): CapchaProcessing class. Default to TesseractOCR().
 
     """
-    deviceIdCommon = f'' ############################################# 
+    deviceIdCommon = f't2ztvkhd-mbib-0000-0000-{get_now_time()}'  
     FPR = 'dd368a67ac24179dc33bdb3271ee08c0'  # FingerPrint using MD5
 
 
@@ -88,16 +88,65 @@ class MBBank:
                 'deviceIdCommon': self.deviceIdCommon,
             }
             json_data.update(json) 
+            headers.update(headers_default)
+            headers["X-Request-Id"] = rid 
+            headers["RefNo"] = rid 
+            headers["DeviceId"] = self.deviceIdCommon 
+            
+            with requests.Session() as s:
+                with s.post(url, headers=headers, json=json_data, proxies=self.proxy) as r:
+                    data_out = r.json()
 
-            # line 82 
+                if data_out["result"] is None:
+                    self.getBalance()
+                elif data_out["result"]["ok"]:
+                    data_out.pop("result", None)
+                    break 
+                elif data_out["result"]["responseCode"] == "GW200":
+                    self._authenticate()
+                else:
+                    err_out = data_out["result"]
+                    raise MBBankError(err_out)
+        return data_out 
 
     
     def _get_wasm_file(self):
-        pass 
+        if self.__wasm_cache is not None:
+            return self.__wasm_cache 
+        file_data = requests.get("https://online.mbbank.com.vn/assets/wasm/main.wasm", headers=headers_default, proxies=self.proxy).content 
+        self.__wasm_cache = file_data 
+        return file_data 
 
 
     def _authenticate(self):
-        pass 
+        while True:
+            self._userinfo = None 
+            self.sessionId = None 
+            self._temp = {}
+            rid = f"{self.__userid}-{get_now_time()}"
+            json_data = {
+                'sessionId': "",
+                'refNo': rid,
+                'deviceIdCommon': self.deviceIdCommon,
+            }
+            headers = headers_default.copy()
+            headers["X-Request-Id"] = rid 
+            with requests.Session() as s:
+                with s.post("https://online.mbbank.com.vn/retail-web-internetbankingms/getCaptchaImage", headers=headers, json=json_data, proxies=self.proxy) as r:
+                    data_out = r.json()
+            img_bytes = base64.b64decode(data_out["imageString"])
+            text = self.ocr_class.process_image(img_bytes)
+            payload = {
+                "userId": self.__userid,
+                "password": hashlib.md5(self.__password.encode()).hexdigest(),
+                "captcha": text,
+                "sessionId": "",
+                "refNo": f"{self.__userid}-{get_now_time()}",
+                "deviceIdCommon": self.deviceIdCommon,
+                "ibAuthen2faString": self.FPR,
+            }
+            wasm_bytes = self._get_wasm_file()
+            dateEnc = None 
 
 
     def getTransactionAccountHistory(self):
