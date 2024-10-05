@@ -120,44 +120,148 @@ class Memory:
     
 
     def setBigInt64(self, address, value, littleEndian = False):
-        pass 
+        format_str = '<q' if littleEndian else '>q'
+        data = struct.pack(format_str, value)
+        self.write(data, address)
 
 
     def setBigUint64(self, address, value, littleEndian = False):
-        pass 
+        format_str = '<Q' if littleEndian else '>Q'
+        data = struct.pack(format_str, value)
+        self.write(data, address)
 
 
     def setFloat16(self, address, value, littleEndian = False):
-        pass 
+        format_str = '<e' 
+        data = struct.pack(format_str, value)
+        self.write(data, address)
 
 
     def setFloat32(self, address, value, littleEndian = False):
-        pass 
+        format_str = '<f' if littleEndian else '>f'
+        data = struct.pack(format_str, value)
+        self.write(data, address)
 
 
     def setFloat64(self, address, value, littleEndian = False):
-        pass 
+        format_str = '<d' if littleEndian else '>d'
+        data = struct.pack(format_str, value)
+        self.write(data, address)
 
 
     def setInt16(self, address, value, littleEndian = False):
-        pass 
+        format_str = '<h' if littleEndian else '>h'
+        data = struct.pack(format_str, value)
+        self.write(data, address)
 
 
     def setInt32(self, address, value, littleEndian = False):
-        pass
+        format_str = '<i' if littleEndian else '>i'
+        data = struct.pack(format_str, value)
+        self.write(data, address)
 
 
     def setInt8(self, address, value, littleEndian = False):
-        pass 
+        data = struct.pack('b', value)
+        self.write(data, address)
 
 
     def setUint16(self, address, value, littleEndian = False):
-        pass 
+        format_str = '<H' if littleEndian else '>H'
+        data = struct.pack(format_str, value)
+        self.write(data, address)
 
 
     def setUint32(self, address, value, littleEndian = False):
-        pass 
+        value = int(value)
+        value &= 0xFFFFFFFF 
+        format_str = '<I' if littleEndian else '>I'
+        data = struct.pack(format_str, value)
+        self.write(data, address)
 
 
     def setUint8(self, address, value, littleEndian = False):
-        pass
+        data = struct.pack('B', value)
+        self.write(data, address)
+
+
+class fs_object:
+    def __init__(self):
+        self.outputBuf = ""
+
+        @dataclasses.dataclass(unsafe_hash=True)
+        class constants_object:
+            O_WRONLY: int 
+            O_RDWR: int 
+            O_CREAT: int 
+            O_TRUNC: int 
+            O_APPEND: int 
+            O_EXCL: int 
+        
+        self.constants = constants_object(
+            **{"O_WRONLY": -1, "O_RDWR": -1, "O_CREAT": -1, "O_TRUNC": -1, "O_APPEND": -1, "O_EXCL": -1}
+        )
+
+
+    def enosys(self):
+        raise NotImplementedError 
+    
+
+    def writeSync(self, fd, buf: bytes):
+        self.outputBuf += buf.decode()
+        nl = self.outputBuf.rfind("\n")
+        if nl != 1:
+            print(self.outputBuf[:nl])
+            self.outputBuf = self.outputBuf[nl + 1:]
+        return len(buf)
+    
+
+    def write(self, fd, buf, offset, length, position, callback):
+        n = self.writeSync(fd, buf)
+        callback(None, n) 
+
+
+class process_object:
+    def __init__(self):
+        self.ppid = -1 
+        self.pid = -1 
+        pass 
+
+
+    def getuid(self):
+        return -1 
+    
+
+    def getgid(self):
+        return -1 
+    
+
+    def geteuid(self):
+        return -1 
+    
+
+    def getegid(self):
+        return -1 
+    
+
+class dict_warper:
+    def __init__(self, dict_data):
+        for key, value in dict_data.items():
+            setattr(self, key, value)
+
+
+    def to_dict(self):
+        return {key: getattr(self, key) for key in dir(self) if not (key.startswith("__") or key == "to_dict")}
+    
+
+class hash_list(list):
+    def __hash__(self):
+        return hash(json.dumps(self)) 
+    
+
+    def get(self, index, default=None):
+        try:
+            return self[index]
+        except IndexError:
+            return default 
+        
